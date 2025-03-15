@@ -1,0 +1,14 @@
+.container {
+    padding: 40px 20px;
+}
+
+.title {
+    margin-bottom: 32px !important;
+    color: #2c3e50;
+}
+
+.score_container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}

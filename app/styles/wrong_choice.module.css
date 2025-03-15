@@ -1,0 +1,29 @@
+.container {
+    width: 100%;
+    display: flex;
+    background-color: #ffebee;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 24px;
+    align-items: center;
+    border: 2px solid #e57373;
+}
+
+.container_left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 24px;
+}
+
+.container_right {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #c62828;
+    margin-bottom: 8px;
+}

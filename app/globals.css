@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --chirpify-green: #1DB954;
+  --chirpify-black: #121212;
+  --chirpify-dark-gray: #181818;
+  --chirpify-light-gray: #282828;
+  --chirpify-white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  height: 100vh;
+  background-color: var(--chirpify-black);
+  color: var(--chirpify-white);
+}
+
+/* Custom progress bar */
+.progress-bar {
+  @apply bg-gray-600 rounded-full h-1 w-full overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply bg-white rounded-full h-full;
+}
+
+.progress-bar-fill:hover,
+.progress-bar:hover .progress-bar-fill {
+  @apply bg-green-500;
+}
+
+/* Chirpify buttons */
+.chirpify-button {
+  @apply bg-green-500 text-black font-semibold rounded-full 
+         hover:bg-green-400 transition-all focus:outline-none;
+}
+
+.chirpify-card {
+  @apply bg-gray-800 p-4 rounded-md hover:bg-gray-700 transition-all;
+}

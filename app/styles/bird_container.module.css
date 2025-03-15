@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    align-items: center;
+}
+
+.bird_img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 16px;
+}
+
+.bird_name {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
