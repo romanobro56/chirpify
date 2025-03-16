@@ -1,40 +1,37 @@
+// app/components/PlayerControls.tsx
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, Volume2 } from "lucide-react";
 import Image from "next/image";
+import { useAudio } from '@/app/components/AudioProvider';
 
-interface Props {
-    currentBird: {
-        name: string;
-        song: string;
-        imgUrl: string;
-    } | null;
-}
+export function PlayerControls() {
+    const { 
+        currentBird, 
+        isPlaying, 
+        progress, 
+        togglePlayPause,
+        seek,
+        duration,
+        currentTime
+    } = useAudio();
 
-export function PlayerControls({ currentBird }: Props) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const audioRef = useRef<HTMLAudioElement>(null);
-
-    const handlePlayPause = () => {
-        if (!currentBird) return;
-        
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play();
-            }
-            setIsPlaying(!isPlaying);
-        }
+    // Format time as mm:ss
+    const formatTime = (seconds: number) => {
+        if (isNaN(seconds)) return "0:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const handleTimeUpdate = () => {
-        if (audioRef.current) {
-            const percent = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-            setProgress(percent);
-        }
+    const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const progressBar = e.currentTarget;
+        const rect = progressBar.getBoundingClientRect();
+        const clickPosition = e.clientX - rect.left;
+        const progressBarWidth = rect.width;
+        const clickPercent = (clickPosition / progressBarWidth) * 100;
+        seek(clickPercent);
     };
 
     return (
@@ -43,11 +40,11 @@ export function PlayerControls({ currentBird }: Props) {
                 {currentBird ? (
                     <>
                         <Image
-                            src={`/birds/${currentBird.imgUrl}`}
+                            src={currentBird.imgUrl}
                             width={56}
                             height={56}
                             alt="Now playing"
-                            className="w-14 h-14 rounded-md"
+                            className="w-14 h-14 rounded-md object-cover"
                         />
                         <div>
                             <p className="font-semibold">{currentBird.name}</p>
@@ -57,23 +54,14 @@ export function PlayerControls({ currentBird }: Props) {
                 ) : (
                     <div className="text-gray-500">No bird selected</div>
                 )}
-                
-                {currentBird && (
-                    <audio 
-                        ref={audioRef} 
-                        src={`/sounds/${currentBird.song}`}
-                        onTimeUpdate={handleTimeUpdate}
-                        onEnded={() => setIsPlaying(false)}
-                    />
-                )}
             </div>
             <div className="flex flex-col items-center max-w-md w-2/5">
                 <div className="flex items-center space-x-6">
-                    <Shuffle size={20} className="text-gray-400 hover:text-white" />
-                    <SkipBack size={20} className="text-gray-400 hover:text-white" />
+                    <Shuffle size={20} className="text-gray-400 hover:text-white cursor-pointer" />
+                    <SkipBack size={20} className="text-gray-400 hover:text-white cursor-pointer" />
                     <button 
                         className="bg-white text-black rounded-full p-2 hover:scale-105 transition"
-                        onClick={handlePlayPause}
+                        onClick={togglePlayPause}
                         disabled={!currentBird}
                     >
                         {isPlaying ? (
@@ -82,21 +70,27 @@ export function PlayerControls({ currentBird }: Props) {
                             <Play fill="currentColor" size={20} />
                         )}
                     </button>
-                    <SkipForward size={20} className="text-gray-400 hover:text-white" />
-                    <Repeat size={20} className="text-gray-400 hover:text-white" />
+                    <SkipForward size={20} className="text-gray-400 hover:text-white cursor-pointer" />
+                    <Repeat size={20} className="text-gray-400 hover:text-white cursor-pointer" />
                 </div>
-                <div className="w-full mt-2">
-                    <div className="progress-bar">
-                        <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+                <div className="w-full mt-2 flex items-center gap-2">
+                    <span className="text-xs text-gray-400">{formatTime(currentTime)}</span>
+                    <div 
+                        className="flex-1 h-1 bg-gray-700 rounded-full cursor-pointer relative"
+                        onClick={handleProgressClick}
+                    >
+                        <div 
+                            className="h-full bg-white rounded-full absolute top-0 left-0" 
+                            style={{ width: `${progress}%` }}
+                        ></div>
                     </div>
+                    <span className="text-xs text-gray-400">{formatTime(duration)}</span>
                 </div>
             </div>
             <div className="flex items-center space-x-4">
                 <Volume2 size={20} />
-                <div className="w-24">
-                    <div className="progress-bar">
-                        <div className="progress-bar-fill w-2/3"></div>
-                    </div>
+                <div className="w-24 h-1 bg-gray-700 rounded-full relative">
+                    <div className="h-full bg-white rounded-full absolute top-0 left-0 w-2/3"></div>
                 </div>
             </div>
         </div>

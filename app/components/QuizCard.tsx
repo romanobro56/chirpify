@@ -1,12 +1,12 @@
+// app/components/QuizCard.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import BirdContainer from './BirdContainer';
 import CorrectChoice from './CorrectChoice';
 import WrongChoice from './WrongChoice';
-import { Button } from '@mui/material';
 import { Play, Pause } from "lucide-react";
-import styles from '../styles/quiz_card.module.css';
+import { useAudio } from '@/app/components/AudioProvider';
 
 interface IBird {
     song: string;
@@ -28,29 +28,17 @@ const QuizCard: React.FC<Props> = ({
     onCorrectAnswer
 }) => {
     const [userChoice, setUserChoice] = useState<string | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [audioUrl, setAudioUrl] = useState<string>(currentBird.song);
-    const audioRef = useRef<HTMLAudioElement>(null);
+    const { 
+        setCurrentBird, 
+        isPlaying, 
+        togglePlayPause 
+    } = useAudio();
 
-    // Load the audio file when currentBird changes
+    // Update audio context when currentBird changes
     useEffect(() => {
-        setAudioUrl(currentBird.song);
+        setCurrentBird(currentBird);
         setUserChoice(null);
-        setIsPlaying(false);
-    }, [currentBird]);
-
-    const handlePlayPause = () => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play().catch(error => {
-                    console.error("Error playing audio:", error);
-                });
-            }
-            setIsPlaying(!isPlaying);
-        }
-    };
+    }, [currentBird, setCurrentBird]);
 
     const handleBirdSelection = (birdName: string) => {
         setUserChoice(birdName);
@@ -61,7 +49,6 @@ const QuizCard: React.FC<Props> = ({
 
     const handleNext = () => {
         setUserChoice(null);
-        setIsPlaying(false);
         onNextQuestion();
     };
 
@@ -71,17 +58,9 @@ const QuizCard: React.FC<Props> = ({
     return (
         <div className="chirpify-card rounded-lg bg-gray-800 p-6 max-w-4xl mx-auto">
             <div className="flex flex-col items-center mb-6">
-                {audioUrl && (
-                    <audio 
-                        ref={audioRef} 
-                        src={audioUrl} 
-                        onEnded={() => setIsPlaying(false)}
-                    />
-                )}
                 <button 
                     className="chirpify-button py-3 px-8 flex items-center"
-                    onClick={handlePlayPause}
-                    disabled={!audioUrl}
+                    onClick={togglePlayPause}
                 >
                     {isPlaying ? (
                         <><Pause size={20} className="mr-2" /> Pause Bird Song</>
