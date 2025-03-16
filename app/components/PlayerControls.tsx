@@ -14,7 +14,8 @@ export function PlayerControls() {
         togglePlayPause,
         seek,
         duration,
-        currentTime
+        currentTime,
+        revealBird
     } = useAudio();
 
     // Format time as mm:ss
@@ -40,14 +41,14 @@ export function PlayerControls() {
                 {currentBird ? (
                     <>
                         <Image
-                            src={currentBird.imgUrl}
+                            src={revealBird ? currentBird.imgUrl : "/unknown_bird.png"}
                             width={56}
                             height={56}
                             alt="Now playing"
                             className="w-14 h-14 rounded-md object-cover"
                         />
                         <div>
-                            <p className="font-semibold">{currentBird.name}</p>
+                            <p className="font-semibold">{revealBird ? currentBird.name : "Unknown Bird"}</p>
                             <p className="text-sm text-gray-400">Bird Song</p>
                         </div>
                     </>

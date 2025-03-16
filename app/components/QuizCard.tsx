@@ -31,17 +31,22 @@ const QuizCard: React.FC<Props> = ({
     const { 
         setCurrentBird, 
         isPlaying, 
-        togglePlayPause 
+        togglePlayPause,
+        setRevealBird,
+        setProgress,
+        setIsPlaying
     } = useAudio();
 
     // Update audio context when currentBird changes
     useEffect(() => {
         setCurrentBird(currentBird);
         setUserChoice(null);
-    }, [currentBird, setCurrentBird]);
+        setRevealBird(false); // Hide the bird for the new question
+    }, [currentBird, setCurrentBird, setRevealBird]);
 
     const handleBirdSelection = (birdName: string) => {
         setUserChoice(birdName);
+        setRevealBird(true); // Reveal the bird when user makes a selection
         if (birdName === currentBird.name) {
             onCorrectAnswer();
         }
@@ -49,6 +54,8 @@ const QuizCard: React.FC<Props> = ({
 
     const handleNext = () => {
         setUserChoice(null);
+        setProgress(0);
+        setIsPlaying(false);
         onNextQuestion();
     };
 

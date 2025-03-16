@@ -1,4 +1,4 @@
-// app/context/AudioContext.tsx
+// app/components/AudioProvider.tsx
 'use client';
 
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
@@ -15,11 +15,14 @@ interface AudioContextType {
     isPlaying: boolean;
     setIsPlaying: (isPlaying: boolean) => void;
     progress: number;
+    setProgress: (progress: number) => void;
     audioRef: React.RefObject<HTMLAudioElement>;
     togglePlayPause: () => void;
     seek: (value: number) => void;
     duration: number;
     currentTime: number;
+    revealBird: boolean;
+    setRevealBird: (reveal: boolean) => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -30,6 +33,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
+    const [revealBird, setRevealBird] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const togglePlayPause = () => {
@@ -92,11 +96,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             isPlaying, 
             setIsPlaying,
             progress,
+            setProgress,
             audioRef,
             togglePlayPause,
             seek,
             duration,
-            currentTime
+            currentTime,
+            revealBird,
+            setRevealBird
         }}>
             {children}
             <audio 
