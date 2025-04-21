@@ -11,15 +11,15 @@ const BirdContainer: React.FC<Props> = ({
     birdImgUrl
 }) => {
   return (
-    <div className="flex items-center">
-        <Image 
-            alt={birdName} 
-            width={60} 
-            height={60} 
+    <div className="flex items-center space-x-3 sm:space-x-4">
+        <Image
+            alt={birdName}
+            width={60}
+            height={60}
             src={`${birdImgUrl}`}
-            className="rounded-md mr-4 object-cover"
+            className="rounded-md w-12 h-12 sm:w-16 sm:h-16 object-cover flex-shrink-0"
         />
-        <p className="text-lg font-medium">
+        <p className="text-sm sm:text-lg font-medium leading-tight">
             {birdName}
         </p>
     </div>

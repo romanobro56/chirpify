@@ -1,8 +1,6 @@
-// app/components/MainContent.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Typography } from '@mui/material';
 import { Play } from "lucide-react";
 import QuizCard from './QuizCard';
 import Image from 'next/image';
@@ -56,113 +54,112 @@ export function MainContent() {
         fetchBirds();
     }, []);
 
-    // Get a random set of birds including the correct one
     const getRandomChoices = (correctBird: IBirdFull): Bird[] => {
         const otherBirds = birds.filter(bird => bird.name !== correctBird.name);
         const shuffled = [...otherBirds].sort(() => 0.5 - Math.random());
-        const selectedBirds = shuffled.slice(0, 3).map(bird => ({
+        const numChoices = Math.min(3, shuffled.length);
+        const selectedBirds = shuffled.slice(0, numChoices).map(bird => ({
             name: bird.name,
             song: `/birds/sounds/${bird.id}.mp3`,
             imgUrl: `/birds/images/${bird.id}.jpg`
         }));
-        
-        // Add the correct bird and shuffle again
+
         const correctBirdSimplified: Bird = {
             name: correctBird.name,
             song: `/birds/sounds/${correctBird.id}.mp3`,
             imgUrl: `/birds/images/${correctBird.id}.jpg`
         };
-        
+
         const allChoices = [...selectedBirds, correctBirdSimplified];
         return allChoices.sort(() => 0.5 - Math.random());
     };
 
-    // Set up a new question
     const setupQuestion = () => {
         if (birds.length === 0) return;
-        
+
+        if (birds.length < 4) {
+            console.warn("Not enough birds loaded to create a full quiz choice set.");
+            setError("Not enough bird data to start the quiz.");
+            return;
+        }
+
         const randomIndex = Math.floor(Math.random() * birds.length);
         setCurrentBirdIndex(randomIndex);
-        
+
         const simplifiedBird: Bird = {
             name: birds[randomIndex].name,
             song: `/birds/sounds/${birds[randomIndex].id}.mp3`,
             imgUrl: `/birds/images/${birds[randomIndex].id}.jpg`
         };
-        
+
         setActiveBird(simplifiedBird);
         setChoices(getRandomChoices(birds[randomIndex]));
     };
 
-    // Handle moving to the next question
     const handleNextQuestion = () => {
         if (questionsAnswered >= 10) {
-            // Reset the quiz after 10 questions
             setScore(0);
             setQuestionsAnswered(0);
         }
         setupQuestion();
     };
 
-    // Handle when user answers correctly
     const handleCorrectAnswer = () => {
         setScore(score + 1);
         setQuestionsAnswered(questionsAnswered + 1);
     };
 
-    // Start the quiz
     const startQuiz = () => {
         setQuizStarted(true);
         setScore(0);
         setQuestionsAnswered(0);
-        setupQuestion();
+        setupQuestion(); 
     };
 
-    // Initialize the quiz when birds are loaded
     useEffect(() => {
-        if (!loading && birds.length > 0) {
-            setupQuestion();
+        if (!loading && birds.length > 0 && !quizStarted) {
         }
-    }, [loading, birds]);
+    }, [loading, birds, quizStarted]);
 
     if (loading) {
-        return <Typography>Loading bird data...</Typography>;
+        return <div className="flex justify-center items-center h-full text-white"><p>Loading bird data...</p></div>;
     }
 
     if (error) {
-        return <Typography color="error">Error loading bird data: {error}</Typography>;
+        return <div className="flex justify-center items-center h-full text-red-400"><p>Error: {error}</p></div>;
     }
 
     return (
-        <div className="flex-1 bg-gradient-to-b from-blue-900 to-black text-white p-8 overflow-y-auto">
-            <div className="flex items-center space-x-4 mb-8">
+        <div className="flex-1 bg-gradient-to-b from-blue-900 to-black text-white p-4 pt-16 lg:pt-8 lg:p-8 overflow-y-auto">
+            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
                 <Image
-                    src="/birds/images/cardinalis_cardinalis.jpg" 
+                    src="/birds/images/cardinalis_cardinalis.jpg"
                     width={200}
                     height={200}
                     alt="Playlist cover"
-                    className="w-52 h-52 shadow-lg"
+                    className="w-32 h-32 sm:w-40 sm:h-40 lg:w-52 lg:h-52 shadow-lg rounded-md" 
                 />
-                <div>
-                    <p className="text-sm font-semibold">QUIZ COLLECTION</p>
-                    <h1 className="text-5xl font-bold mt-2 mb-4">Northeast Nesting Notes</h1>
-                    <p className="text-sm text-gray-300">Created by Chirpify • {birds.length} birds, 10 questions</p>
+                <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-semibold">QUIZ COLLECTION</p>
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mt-1 mb-2 sm:mt-2 sm:mb-4">Northeast Nesting Notes</h1>
+                    <p className="text-xs sm:text-sm text-gray-300">Created by Chirpify • {birds.length} birds, 10 questions</p>
                     <p className="mt-2 text-sm">
                         Score: {score} / {questionsAnswered}
                     </p>
                 </div>
             </div>
-            
+
             <div className="mb-8">
-                <button 
-                    className="bg-green-500 text-black font-semibold py-3 px-8 rounded-full hover:bg-green-400"
+                <button
+                    className="bg-green-500 text-black font-semibold py-2 px-6 sm:py-3 sm:px-8 rounded-full hover:bg-green-400 flex items-center mx-auto sm:mx-0" // Center button on mobile
                     onClick={startQuiz}
+                    disabled={loading || !!error || (birds.length < 4 && !quizStarted)}
                 >
                     <Play fill="currentColor" size={20} className="inline mr-2" />
                     {quizStarted ? "Restart Quiz" : "Start Quiz"}
                 </button>
             </div>
-            
+
             {quizStarted && activeBird && (
                 <QuizCard
                     currentBird={activeBird}
@@ -171,6 +168,8 @@ export function MainContent() {
                     onCorrectAnswer={handleCorrectAnswer}
                 />
             )}
+
+             <div className="h-16"></div>
         </div>
     );
 }
